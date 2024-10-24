@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class Notas {
+    public class Notas {
         private String titulo;
         private String conteudo;
 
@@ -8,39 +8,43 @@ public class Notas {
             this.titulo = titulo;
             this.conteudo = conteudo;
         }
+
+        public String exibirNotaSemCategoria(String titulo, String conteudo){
+            return "Título: " + titulo + "\nConteúdo: " + conteudo;
+        }
     }
 
     class NotaImportante extends Notas{
         public NotaImportante(String titulo, String conteudo) {
             super(titulo, conteudo);
         }
+
+        public String exibirNotaSemCategoria(String titulo, String conteudo){
+            return "Titulo (Nota Importante!): " + titulo + "\nConteudo: " + conteudo;
+        }
     }
 
-    class NotaFinalizada extends Notas{
+    class NotaFinalizada extends Notas {
         public NotaFinalizada(String titulo, String conteudo) {
             super(titulo, conteudo);
         }
-    }
 
-    class Usuario{
-        private String usuario;
-        private String senha;
-            
-        public Usuario(String usuario, String senha) {
-            this.usuario = usuario;
-            this.senha = senha;
+
+        public String exibirNotaSemCategoria(String titulo, String conteudo) {
+            return "Titulo (Nota finalizada): " + titulo + "\nConteudo: " + conteudo;
         }
+    }
 
     class Categorias {
         private String nomeCategoria;
         private ArrayList<Notas> listaDeNotas;
 
-        public Categorias(String nomeCategoria) {
+        public Categorias(String nomeCategoria, ArrayList<Notas> listaDeNotas) {
             this.nomeCategoria = nomeCategoria;
             this.listaDeNotas = new ArrayList<>();
         }
 
-        public void adicionarNota(Notas nota) {
+        public void adicionarNota(Notas nota){
             listaDeNotas.add(nota);
         
 
@@ -57,4 +61,3 @@ public class Notas {
         abstract void importarArquivo();
     }
 }
-
