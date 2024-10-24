@@ -8,17 +8,27 @@
             this.titulo = titulo;
             this.conteudo = conteudo;
         }
+
+         public String exibirNotaSemCategoria(String titulo, String conteudo){
+            return "Título: " + titulo + "\nConteúdo: " + conteudo;
+        }
     }
 
     class NotaImportante extends Notas{
         public NotaImportante(String titulo, String conteudo) {
             super(titulo, conteudo);
         }
+        public String exibirNotaSemCategoria(String titulo, String conteudo){
+            return "Titulo (Nota Importante!): " + titulo + "\nConteudo: " + conteudo;
+        }
     }
 
     class NotaFinalizada extends Notas{
         public NotaFinalizada(String titulo, String conteudo) {
             super(titulo, conteudo);
+        }
+        public String exibirNotaSemCategoria(String titulo, String conteudo){
+            return "Titulo (Nota Finalizada!): " + titulo + "\nConteudo: " + conteudo;
         }
     }
 
