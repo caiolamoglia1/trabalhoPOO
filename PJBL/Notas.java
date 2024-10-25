@@ -1,4 +1,6 @@
-    import java.util.ArrayList;
+package PJBL;
+
+import java.util.ArrayList;
 
     public class Notas {
         private String titulo;
