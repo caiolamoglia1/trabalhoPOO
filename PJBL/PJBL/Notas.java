@@ -1,6 +1,6 @@
-package PJBL;
 
 import java.util.ArrayList;
+import javax.swing.*;
 
     public class Notas {
         private String titulo;
@@ -76,6 +76,26 @@ import java.util.ArrayList;
         abstract void exportarArquivo();
         abstract void importarArquivo();
     }
-class oi{
+class CriarNota {
+    public void criarNovaNota(Categorias categoria) {
+        String titulo = JOptionPane.showInputDialog("Digite o título da nota:");
+        String conteudo = JOptionPane.showInputDialog("Digite o conteúdo da nota:");
 
+        if (titulo != null && conteudo != null) {
+            Notas novaNota = new Notas(titulo, conteudo);
+            categoria.adicionarNota(novaNota);
+            JOptionPane.showMessageDialog(null, "Nota adicionada com sucesso!");
+        } else {
+            JOptionPane.showMessageDialog(null, "Criação de nota cancelada.");
+        }
+    }
+}
+
+class Main {
+    public static void main(String[] args) {
+        Categorias categoria = new Categorias("Minhas Notas");
+        CriarNota criarNota = new CriarNota();
+        criarNota.criarNovaNota(categoria);
+        categoria.exibirNotas();
+    }
 }
