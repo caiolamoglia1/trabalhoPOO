@@ -42,7 +42,7 @@ class Categorias {
     }
 }
 
-class NotasMenu {
+class NotasMenuPrincipal {
     private static ArrayList<Categorias> categoriasList = new ArrayList<>();
 
     public static void main(String[] args) {
