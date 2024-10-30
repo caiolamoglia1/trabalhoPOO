@@ -15,11 +15,6 @@ public class Notas {
         this.categoria = categoria;
     }
 
-    public String exibirNotaSemCategoria() {
-        return "Título: " + titulo + "\nConteúdo: " + conteudo;
-    }
-
-    @Override
     public String toString() {
         return titulo + " (" + categoria + ")";
     }
