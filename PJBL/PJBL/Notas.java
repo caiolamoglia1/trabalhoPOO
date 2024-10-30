@@ -41,7 +41,7 @@ import javax.swing.*;
         private ArrayList<NotaImportante> listaDeNotasImportantes;
 
 
-        public Categorias(String nomeCategoria, ArrayList <Notas> listaDeNotas, ArrayList<NotaFinalizada> listaDeNotasFinalizadas, ArrayList<NotaImportante> listaDeNotasImportantes) {
+        public Categorias(String nomeCategoria) {
             this.nomeCategoria = nomeCategoria;
             this.listaDeNotas = new ArrayList<>();
             this.listaDeNotasFinalizadas = new ArrayList<>();
