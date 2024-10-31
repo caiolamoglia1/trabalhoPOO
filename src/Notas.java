@@ -18,6 +18,32 @@ public class Notas {
     public String toString() {
         return titulo + " (" + categoria + ")";
     }
+
+    public String getConteudo() {
+        return conteudo;
+    }
+}
+
+class NotasImportantes extends Notas {
+    public NotasImportantes(String titulo, String conteudo) {
+        super(titulo, conteudo, "Importante");
+    }
+
+    @Override
+    public String toString() {
+        return "Importante: " + super.toString();
+    }
+}
+
+class NotasFinalizadas extends Notas {
+    public NotasFinalizadas(String titulo, String conteudo) {
+        super(titulo, conteudo, "Finalizada");
+    }
+
+    @Override
+    public String toString() {
+        return "Finalizada: " + super.toString();
+    }
 }
 
 class Categorias {
@@ -42,7 +68,7 @@ class Categorias {
     }
 }
 
-class NotasMenu {
+class NotasMenuPrincipal {
     private static ArrayList<Categorias> categoriasList = new ArrayList<>();
 
     public static void main(String[] args) {
@@ -91,6 +117,16 @@ class NotasMenu {
         painelSuperior.add(comboCategorias);
         frame.add(painelSuperior, BorderLayout.EAST);
 
+        // Adiciona o listener para mostrar o conteúdo da nota ao selecionar
+        listaDeNotas.addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                Notas notaSelecionada = listaDeNotas.getSelectedValue();
+                if (notaSelecionada != null) {
+                    mostrarConteudoNota(frame, notaSelecionada);
+                }
+            }
+        });
+
         atualizarListaDeNotas(model, "Todas");
 
         frame.setVisible(true);
@@ -105,6 +141,10 @@ class NotasMenu {
         painelSuperior.setLayout(new FlowLayout(FlowLayout.LEFT));
 
         JTextField campoTitulo = new JTextField(20);
+        JTextArea areaTexto = new JTextArea(10, 30);
+        areaTexto.setLineWrap(true);
+        areaTexto.setWrapStyleWord(true);
+        JScrollPane scrollPane = new JScrollPane(areaTexto);
 
         JComboBox<String> comboCategorias = new JComboBox<>();
         for (Categorias categoria : categoriasList) {
@@ -117,46 +157,77 @@ class NotasMenu {
         painelSuperior.add(comboCategorias);
 
         dialog.add(painelSuperior, BorderLayout.NORTH);
-
-        JTextArea areaTexto = new JTextArea(10, 30);
-        areaTexto.setLineWrap(true);
-        areaTexto.setWrapStyleWord(true);
-
-        JScrollPane scrollPane = new JScrollPane(areaTexto);
         dialog.add(scrollPane, BorderLayout.CENTER);
 
         JPanel painelBotao = new JPanel();
         painelBotao.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
         JButton buttonSalvar = new JButton("Salvar Nota");
-        buttonSalvar.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String titulo = campoTitulo.getText();
-                String conteudo = areaTexto.getText();
-                String categoria = (String) comboCategorias.getSelectedItem();
-                if (!titulo.isEmpty() && !conteudo.isEmpty()) {
-                    Notas novaNota = new Notas(titulo, conteudo, categoria);
-                    for (Categorias cat : categoriasList) {
-                        if (cat.getNomeCategoria().equals(categoria)) {
-                            cat.adicionarNota(novaNota);
-                            break;
-                        }
+        buttonSalvar.addActionListener(e -> {
+            String titulo = campoTitulo.getText();
+            String conteudo = areaTexto.getText();
+            String categoria = (String) comboCategorias.getSelectedItem();
+            if (!titulo.isEmpty() && !conteudo.isEmpty()) {
+                Notas novaNota = new Notas(titulo, conteudo, categoria);
+                for (Categorias cat : categoriasList) {
+                    if (cat.getNomeCategoria().equals(categoria)) {
+                        cat.adicionarNota(novaNota);
+                        break;
                     }
-                    atualizarListaDeNotas(model, "Todas");
-                    JOptionPane.showMessageDialog(dialog, "Nota salva com sucesso!");
-                    dialog.dispose();
-                } else {
-                    JOptionPane.showMessageDialog(dialog, "Título e conteúdo não podem estar vazios.");
                 }
+                atualizarListaDeNotas(model, "Todas");
+                JOptionPane.showMessageDialog(dialog, "Nota salva com sucesso!");
+                dialog.dispose();
+            } else {
+                JOptionPane.showMessageDialog(dialog, "Título e conteúdo não podem estar vazios.");
+            }
+        });
+
+        JButton buttonMarcarImportante = new JButton("Marcar como Importante");
+        buttonMarcarImportante.addActionListener(e -> {
+            String titulo = campoTitulo.getText();
+            String conteudo = areaTexto.getText();
+            if (!titulo.isEmpty() && !conteudo.isEmpty()) {
+                NotasImportantes notaImportante = new NotasImportantes(titulo, conteudo);
+                for (Categorias cat : categoriasList) {
+                    cat.adicionarNota(notaImportante);
+                }
+                atualizarListaDeNotas(model, "Todas");
+                JOptionPane.showMessageDialog(dialog, "Nota marcada como Importante!");
+                dialog.dispose();
+            } else {
+                JOptionPane.showMessageDialog(dialog, "Título e conteúdo não podem estar vazios.");
+            }
+        });
+
+        JButton buttonMarcarFinalizada = new JButton("Marcar como Finalizada");
+        buttonMarcarFinalizada.addActionListener(e -> {
+            String titulo = campoTitulo.getText();
+            String conteudo = areaTexto.getText();
+            if (!titulo.isEmpty() && !conteudo.isEmpty()) {
+                NotasFinalizadas notaFinalizada = new NotasFinalizadas(titulo, conteudo);
+                for (Categorias cat : categoriasList) {
+                    cat.adicionarNota(notaFinalizada);
+                }
+                atualizarListaDeNotas(model, "Todas");
+                JOptionPane.showMessageDialog(dialog, "Nota marcada como Finalizada!");
+                dialog.dispose();
+            } else {
+                JOptionPane.showMessageDialog(dialog, "Título e conteúdo não podem estar vazios.");
             }
         });
 
         painelBotao.add(buttonSalvar);
+        painelBotao.add(buttonMarcarImportante);
+        painelBotao.add(buttonMarcarFinalizada);
         dialog.add(painelBotao, BorderLayout.SOUTH);
 
         dialog.setVisible(true);
     }
 
+    private static void mostrarConteudoNota(JFrame parentFrame, Notas nota) {
+        JOptionPane.showMessageDialog(parentFrame, nota.getConteudo(), "Conteúdo da Nota", JOptionPane.INFORMATION_MESSAGE);
+    }
 
     private static void atualizarListaDeNotas(DefaultListModel<Notas> model, String categoriaSelecionada) {
         model.clear();
