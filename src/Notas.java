@@ -19,32 +19,12 @@ public class Notas {
         return titulo + " (" + categoria + ")";
     }
 
-    public String getConteudo() {
-        return conteudo;
+    // Método para exibir título e conteúdo da nota
+    public String exibirNota() {
+        return "Título: " + titulo + "\nConteúdo: " + conteudo;
     }
 }
 
-class NotasImportantes extends Notas {
-    public NotasImportantes(String titulo, String conteudo) {
-        super(titulo, conteudo, "Importante");
-    }
-
-    @Override
-    public String toString() {
-        return "Importante: " + super.toString();
-    }
-}
-
-class NotasFinalizadas extends Notas {
-    public NotasFinalizadas(String titulo, String conteudo) {
-        super(titulo, conteudo, "Finalizada");
-    }
-
-    @Override
-    public String toString() {
-        return "Finalizada: " + super.toString();
-    }
-}
 
 class Categorias {
     private String nomeCategoria;
@@ -101,12 +81,13 @@ class NotasMenuPrincipal {
         painelBotao.add(buttonCriarNota);
         frame.add(painelBotao, BorderLayout.SOUTH);
 
+        // Adicionar filtro de categoria
         JComboBox<String> comboCategorias = new JComboBox<>();
-        comboCategorias.addItem("Todas"); // Opção para mostrar todas as notas
+        comboCategorias.addItem("Todas");
         for (Categorias categoria : categoriasList) {
             comboCategorias.addItem(categoria.getNomeCategoria());
         }
-        comboCategorias.setSelectedItem("Todas"); // Definir "Todas" como padrão
+        comboCategorias.setSelectedItem("Todas");
         comboCategorias.addActionListener(e -> {
             String categoriaSelecionada = (String) comboCategorias.getSelectedItem();
             atualizarListaDeNotas(model, categoriaSelecionada);
@@ -117,19 +98,45 @@ class NotasMenuPrincipal {
         painelSuperior.add(comboCategorias);
         frame.add(painelSuperior, BorderLayout.EAST);
 
-        // Adiciona o listener para mostrar o conteúdo da nota ao selecionar
-        listaDeNotas.addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting()) {
-                Notas notaSelecionada = listaDeNotas.getSelectedValue();
-                if (notaSelecionada != null) {
-                    mostrarConteudoNota(frame, notaSelecionada);
+        atualizarListaDeNotas(model, "Todas");
+
+        // Exibir conteúdo da nota ao clicar duas vezes
+        listaDeNotas.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                if (evt.getClickCount() == 2) { // Verifica se houve um duplo clique
+                    Notas notaSelecionada = listaDeNotas.getSelectedValue();
+                    if (notaSelecionada != null) {
+                        mostrarConteudoNota(frame, notaSelecionada);
+                    }
                 }
             }
         });
 
-        atualizarListaDeNotas(model, "Todas");
-
         frame.setVisible(true);
+    }
+
+    private static void mostrarConteudoNota(JFrame parentFrame, Notas nota) {
+        JDialog dialog = new JDialog(parentFrame, "Conteúdo da Nota", true);
+        dialog.setSize(600, 500);
+        dialog.setLayout(new BorderLayout());
+
+        // Exibir o conteúdo da nota usando o método exibirNota
+        JTextArea areaTexto = new JTextArea(nota.exibirNota());
+        areaTexto.setEditable(false);
+        areaTexto.setLineWrap(true);
+        areaTexto.setWrapStyleWord(true);
+        JScrollPane scrollPane = new JScrollPane(areaTexto);
+        dialog.add(scrollPane, BorderLayout.CENTER);
+
+        JButton buttonFechar = new JButton("Fechar");
+        buttonFechar.addActionListener(e -> dialog.dispose());
+
+        JPanel painelBotao = new JPanel();
+        painelBotao.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        painelBotao.add(buttonFechar);
+        dialog.add(painelBotao, BorderLayout.SOUTH);
+
+        dialog.setVisible(true);
     }
 
     private static void criarNota(JFrame parentFrame, DefaultListModel<Notas> model) {
@@ -141,10 +148,6 @@ class NotasMenuPrincipal {
         painelSuperior.setLayout(new FlowLayout(FlowLayout.LEFT));
 
         JTextField campoTitulo = new JTextField(20);
-        JTextArea areaTexto = new JTextArea(10, 30);
-        areaTexto.setLineWrap(true);
-        areaTexto.setWrapStyleWord(true);
-        JScrollPane scrollPane = new JScrollPane(areaTexto);
 
         JComboBox<String> comboCategorias = new JComboBox<>();
         for (Categorias categoria : categoriasList) {
@@ -157,76 +160,44 @@ class NotasMenuPrincipal {
         painelSuperior.add(comboCategorias);
 
         dialog.add(painelSuperior, BorderLayout.NORTH);
+
+        JTextArea areaTexto = new JTextArea(10, 30);
+        areaTexto.setLineWrap(true);
+        areaTexto.setWrapStyleWord(true);
+
+        JScrollPane scrollPane = new JScrollPane(areaTexto);
         dialog.add(scrollPane, BorderLayout.CENTER);
 
         JPanel painelBotao = new JPanel();
         painelBotao.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
         JButton buttonSalvar = new JButton("Salvar Nota");
-        buttonSalvar.addActionListener(e -> {
-            String titulo = campoTitulo.getText();
-            String conteudo = areaTexto.getText();
-            String categoria = (String) comboCategorias.getSelectedItem();
-            if (!titulo.isEmpty() && !conteudo.isEmpty()) {
-                Notas novaNota = new Notas(titulo, conteudo, categoria);
-                for (Categorias cat : categoriasList) {
-                    if (cat.getNomeCategoria().equals(categoria)) {
-                        cat.adicionarNota(novaNota);
-                        break;
+        buttonSalvar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String titulo = campoTitulo.getText();
+                String conteudo = areaTexto.getText();
+                String categoria = (String) comboCategorias.getSelectedItem();
+                if (!titulo.isEmpty() && !conteudo.isEmpty()) {
+                    Notas novaNota = new Notas(titulo, conteudo, categoria);
+                    for (Categorias cat : categoriasList) {
+                        if (cat.getNomeCategoria().equals(categoria)) {
+                            cat.adicionarNota(novaNota);
+                            break;
+                        }
                     }
+                    atualizarListaDeNotas(model, "Todas");
+                    JOptionPane.showMessageDialog(dialog, "Nota salva com sucesso!");
+                    dialog.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(dialog, "Título e conteúdo não podem estar vazios.");
                 }
-                atualizarListaDeNotas(model, "Todas");
-                JOptionPane.showMessageDialog(dialog, "Nota salva com sucesso!");
-                dialog.dispose();
-            } else {
-                JOptionPane.showMessageDialog(dialog, "Título e conteúdo não podem estar vazios.");
-            }
-        });
-
-        JButton buttonMarcarImportante = new JButton("Marcar como Importante");
-        buttonMarcarImportante.addActionListener(e -> {
-            String titulo = campoTitulo.getText();
-            String conteudo = areaTexto.getText();
-            if (!titulo.isEmpty() && !conteudo.isEmpty()) {
-                NotasImportantes notaImportante = new NotasImportantes(titulo, conteudo);
-                for (Categorias cat : categoriasList) {
-                    cat.adicionarNota(notaImportante);
-                }
-                atualizarListaDeNotas(model, "Todas");
-                JOptionPane.showMessageDialog(dialog, "Nota marcada como Importante!");
-                dialog.dispose();
-            } else {
-                JOptionPane.showMessageDialog(dialog, "Título e conteúdo não podem estar vazios.");
-            }
-        });
-
-        JButton buttonMarcarFinalizada = new JButton("Marcar como Finalizada");
-        buttonMarcarFinalizada.addActionListener(e -> {
-            String titulo = campoTitulo.getText();
-            String conteudo = areaTexto.getText();
-            if (!titulo.isEmpty() && !conteudo.isEmpty()) {
-                NotasFinalizadas notaFinalizada = new NotasFinalizadas(titulo, conteudo);
-                for (Categorias cat : categoriasList) {
-                    cat.adicionarNota(notaFinalizada);
-                }
-                atualizarListaDeNotas(model, "Todas");
-                JOptionPane.showMessageDialog(dialog, "Nota marcada como Finalizada!");
-                dialog.dispose();
-            } else {
-                JOptionPane.showMessageDialog(dialog, "Título e conteúdo não podem estar vazios.");
             }
         });
 
         painelBotao.add(buttonSalvar);
-        painelBotao.add(buttonMarcarImportante);
-        painelBotao.add(buttonMarcarFinalizada);
         dialog.add(painelBotao, BorderLayout.SOUTH);
 
         dialog.setVisible(true);
-    }
-
-    private static void mostrarConteudoNota(JFrame parentFrame, Notas nota) {
-        JOptionPane.showMessageDialog(parentFrame, nota.getConteudo(), "Conteúdo da Nota", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private static void atualizarListaDeNotas(DefaultListModel<Notas> model, String categoriaSelecionada) {
