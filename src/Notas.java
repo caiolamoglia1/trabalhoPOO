@@ -129,7 +129,7 @@ class NotasMenuPrincipal {
         dialog.setSize(600, 500);
         dialog.setLayout(new BorderLayout());
 
-        JTextArea areaTexto = new JTextArea(nota.exibirNotaSem());
+        JTextArea areaTexto = new JTextArea(nota.exibirNota());
         areaTexto.setEditable(false);
         areaTexto.setLineWrap(true);
         areaTexto.setWrapStyleWord(true);
