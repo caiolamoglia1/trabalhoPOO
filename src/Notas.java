@@ -18,7 +18,13 @@ public class Notas {
     public String toString() {
         return titulo + " (" + categoria + ")";
     }
+
+    // Método para exibir título e conteúdo da nota
+    public String exibirNota() {
+        return "Título: " + titulo + "\nConteúdo: " + conteudo;
+    }
 }
+
 
 class Categorias {
     private String nomeCategoria;
@@ -42,7 +48,7 @@ class Categorias {
     }
 }
 
-class NotasMenu {
+class NotasMenuPrincipal {
     private static ArrayList<Categorias> categoriasList = new ArrayList<>();
 
     public static void main(String[] args) {
@@ -75,12 +81,13 @@ class NotasMenu {
         painelBotao.add(buttonCriarNota);
         frame.add(painelBotao, BorderLayout.SOUTH);
 
+        // Adicionar filtro de categoria
         JComboBox<String> comboCategorias = new JComboBox<>();
-        comboCategorias.addItem("Todas"); // Opção para mostrar todas as notas
+        comboCategorias.addItem("Todas");
         for (Categorias categoria : categoriasList) {
             comboCategorias.addItem(categoria.getNomeCategoria());
         }
-        comboCategorias.setSelectedItem("Todas"); // Definir "Todas" como padrão
+        comboCategorias.setSelectedItem("Todas");
         comboCategorias.addActionListener(e -> {
             String categoriaSelecionada = (String) comboCategorias.getSelectedItem();
             atualizarListaDeNotas(model, categoriaSelecionada);
@@ -93,7 +100,43 @@ class NotasMenu {
 
         atualizarListaDeNotas(model, "Todas");
 
+        // Exibir conteúdo da nota ao clicar duas vezes
+        listaDeNotas.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                if (evt.getClickCount() == 2) { // Verifica se houve um duplo clique
+                    Notas notaSelecionada = listaDeNotas.getSelectedValue();
+                    if (notaSelecionada != null) {
+                        mostrarConteudoNota(frame, notaSelecionada);
+                    }
+                }
+            }
+        });
+
         frame.setVisible(true);
+    }
+
+    private static void mostrarConteudoNota(JFrame parentFrame, Notas nota) {
+        JDialog dialog = new JDialog(parentFrame, "Conteúdo da Nota", true);
+        dialog.setSize(600, 500);
+        dialog.setLayout(new BorderLayout());
+
+        // Exibir o conteúdo da nota usando o método exibirNota
+        JTextArea areaTexto = new JTextArea(nota.exibirNota());
+        areaTexto.setEditable(false);
+        areaTexto.setLineWrap(true);
+        areaTexto.setWrapStyleWord(true);
+        JScrollPane scrollPane = new JScrollPane(areaTexto);
+        dialog.add(scrollPane, BorderLayout.CENTER);
+
+        JButton buttonFechar = new JButton("Fechar");
+        buttonFechar.addActionListener(e -> dialog.dispose());
+
+        JPanel painelBotao = new JPanel();
+        painelBotao.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        painelBotao.add(buttonFechar);
+        dialog.add(painelBotao, BorderLayout.SOUTH);
+
+        dialog.setVisible(true);
     }
 
     private static void criarNota(JFrame parentFrame, DefaultListModel<Notas> model) {
@@ -156,7 +199,6 @@ class NotasMenu {
 
         dialog.setVisible(true);
     }
-
 
     private static void atualizarListaDeNotas(DefaultListModel<Notas> model, String categoriaSelecionada) {
         model.clear();
