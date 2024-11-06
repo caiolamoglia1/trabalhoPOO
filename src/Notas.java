@@ -7,6 +7,14 @@ import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.ArrayList;
 
+
+
+class NotaVaziaException extends Exception{
+    public NotaVaziaException(String mensagem) {
+        super(mensagem); // Passa a mensagem para a classe pai (Exception)
+    }
+}
+
 public class Notas implements Serializable {
     private String titulo;
     private String conteudo;
@@ -203,7 +211,12 @@ class NotasMenuPrincipal {
                 String titulo = campoTitulo.getText();
                 String conteudo = areaTexto.getText();
                 String categoria = (String) comboCategorias.getSelectedItem();
-                if (!titulo.isEmpty() && !conteudo.isEmpty()) {
+
+                try {
+                    if (titulo.isEmpty() || conteudo.isEmpty()) {
+                        throw new NotaVaziaException("Título e conteúdo não podem estar vazios.");
+                    }
+
                     Notas novaNota = new Notas(titulo, conteudo, categoria);
                     for (Categorias cat : categoriasList) {
                         if (cat.getNomeCategoria().equals(categoria)) {
@@ -214,8 +227,9 @@ class NotasMenuPrincipal {
                     atualizarListaDeNotas(model, "Todas");
                     JOptionPane.showMessageDialog(dialog, "Nota salva com sucesso!");
                     dialog.dispose();
-                } else {
-                    JOptionPane.showMessageDialog(dialog, "Título e conteúdo não podem estar vazios.");
+
+                } catch (NotaVaziaException ex) {
+                    JOptionPane.showMessageDialog(dialog, ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
