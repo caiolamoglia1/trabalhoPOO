@@ -7,8 +7,6 @@ import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.ArrayList;
 
-
-
 class NotaVaziaException extends Exception{
     public NotaVaziaException(String mensagem) {
         super(mensagem); // Passa a mensagem para a classe pai (Exception)
