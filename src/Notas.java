@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.List;
 
 class NotaVaziaException extends Exception{
     public NotaVaziaException(String mensagem) {
@@ -33,7 +34,7 @@ public class Notas implements Serializable {
     }
 }
 
-class NotasImportantes extends Notas implements Serializable{
+class NotasImportantes extends Notas implements Serializable {
     public NotasImportantes(String titulo, String conteudo) {
         super(titulo, conteudo, "Importante");
     }
@@ -43,7 +44,7 @@ class NotasImportantes extends Notas implements Serializable{
     }
 }
 
-class NotasFinalizadas extends Notas implements Serializable{
+class NotasFinalizadas extends Notas implements Serializable {
     public NotasFinalizadas(String titulo, String conteudo) {
         super(titulo, conteudo, "Finalizada");
     }
@@ -53,7 +54,7 @@ class NotasFinalizadas extends Notas implements Serializable{
     }
 }
 
-class Categorias implements Serializable{
+class Categorias implements Serializable {
     private String nomeCategoria;
     private ArrayList<Notas> listaDeNotas;
 
@@ -77,13 +78,17 @@ class Categorias implements Serializable{
 
 class NotasMenuPrincipal {
     private static ArrayList<Categorias> categoriasList = new ArrayList<>();
+    private static ArrayList<Notas> notasExcluidas = new ArrayList<>();
 
     public static void main(String[] args) {
         try {
-            categoriasList = Persistencia.carregarNotas();
+            ArrayList<Object> dados = Persistencia.carregarNotas();
+            categoriasList = (ArrayList<Categorias>) dados.get(0);
+            notasExcluidas = (ArrayList<Notas>) dados.get(1);
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("Não foi possível carregar as notas: " + e.getMessage());
         }
+
         categoriasList.add(new Categorias("Trabalho"));
         categoriasList.add(new Categorias("Estudo"));
         categoriasList.add(new Categorias("Pessoal"));
@@ -108,7 +113,7 @@ class NotasMenuPrincipal {
             public void actionPerformed(ActionEvent e) {
                 criarNota(frame, model);
                 try {
-                    Persistencia.salvarNotas(categoriasList);
+                    Persistencia.salvarNotas(categoriasList, notasExcluidas);
                 } catch (IOException ex) {
                     System.out.println("Não foi possível salvar as notas: " + ex.getMessage());
                 }
@@ -116,6 +121,15 @@ class NotasMenuPrincipal {
         });
 
         painelBotao.add(buttonCriarNota);
+
+        JButton buttonNotasExcluidas = new JButton("Notas Excluídas");
+        buttonNotasExcluidas.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                mostrarNotasExcluidas();
+            }
+        });
+        painelBotao.add(buttonNotasExcluidas); // Adiciona ao painel de botões
+
         frame.add(painelBotao, BorderLayout.SOUTH);
 
         JComboBox<String> comboCategorias = new JComboBox<>();
@@ -238,6 +252,41 @@ class NotasMenuPrincipal {
         dialog.setVisible(true);
     }
 
+    private static void excluirNota(Notas nota) {
+        for (Categorias categoria : categoriasList) {
+            if (categoria.getListaDeNotas().remove(nota)) {
+                notasExcluidas.add(nota); // Adiciona à lista de excluídas
+                break;
+            }
+        }
+    }
+
+    private static void mostrarNotasExcluidas() {
+        JDialog dialog = new JDialog((JFrame) null, "Notas Excluídas", true);
+        dialog.setSize(600, 500);
+        dialog.setLayout(new BorderLayout());
+
+        DefaultListModel<Notas> modelExcluidas = new DefaultListModel<>();
+        for (Notas nota : notasExcluidas) {
+            modelExcluidas.addElement(nota);
+        }
+
+        JList<Notas> listaExcluidas = new JList<>(modelExcluidas);
+        JScrollPane scrollPane = new JScrollPane(listaExcluidas);
+        dialog.add(scrollPane, BorderLayout.CENTER);
+
+        JPanel painelBotao = new JPanel();
+        painelBotao.setLayout(new FlowLayout(FlowLayout.RIGHT));
+
+        JButton buttonFechar = new JButton("Fechar");
+        buttonFechar.addActionListener(e -> dialog.dispose());
+
+        painelBotao.add(buttonFechar);
+        dialog.add(painelBotao, BorderLayout.SOUTH);
+
+        dialog.setVisible(true);
+    }
+
     private static void atualizarListaDeNotas(DefaultListModel<Notas> model, String categoriaSelecionada) {
         model.clear();
         if ("Todas".equals(categoriaSelecionada)) {
@@ -262,15 +311,18 @@ class NotasMenuPrincipal {
 class Persistencia {
     private static String nomeArquivo = "Notas.txt";
 
-    public static void salvarNotas(ArrayList<Categorias> categoriasList) throws IOException {
+    public static void salvarNotas(ArrayList<Categorias> categoriasList, ArrayList<Notas> notasExcluidas) throws IOException {
         try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(nomeArquivo))) {
             outputStream.writeObject(categoriasList);
+            outputStream.writeObject(notasExcluidas);
         }
     }
 
-    public static ArrayList<Categorias> carregarNotas() throws IOException, ClassNotFoundException {
+    public static ArrayList<Object> carregarNotas() throws IOException, ClassNotFoundException {
         try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(nomeArquivo))) {
-            return (ArrayList<Categorias>) inputStream.readObject();
+            ArrayList<Categorias> categoriasList = (ArrayList<Categorias>) inputStream.readObject();
+            ArrayList<Notas> notasExcluidas = (ArrayList<Notas>) inputStream.readObject(); // Carrega as notas excluídas
+            return new ArrayList<>(List.of(categoriasList, notasExcluidas));
         }
     }
 }
