@@ -122,6 +122,29 @@ class NotasMenuPrincipal {
 
         painelBotao.add(buttonCriarNota);
 
+        JButton buttonExcluirNotas = new JButton("Excluir Nota");
+        buttonExcluirNotas .addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Notas notaSelecionada = listaDeNotas.getSelectedValue();
+                if (notaSelecionada != null){
+                    excluirNota(notaSelecionada);
+                    atualizarListaDeNotas(model, "Todas");
+
+                    try {
+                        Persistencia.salvarNotas(categoriasList, notasExcluidas);
+                    }  catch (IOException ex) {
+                        System.out.println("Não foi possivel salvar as notas:" + ex.getMessage());
+                    }
+                    JOptionPane.showMessageDialog(frame, "Nota excluída com sucesso!");
+                } else {
+                    JOptionPane.showMessageDialog(frame, "Selecione uma nota para excluir.", "ERRO", JOptionPane.ERROR_MESSAGE);
+                }
+
+
+            }
+        });
+        painelBotao.add(buttonExcluirNotas);
+
         JButton buttonNotasExcluidas = new JButton("Notas Excluídas");
         buttonNotasExcluidas.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
