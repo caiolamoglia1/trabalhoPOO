@@ -422,7 +422,6 @@ class ArquivoTxt extends Arquivos {
         }
     }
 }
-
 class ArquivoCsv extends Arquivos{
 
     public void lerArquivo(File arquivoSelecionado) {
