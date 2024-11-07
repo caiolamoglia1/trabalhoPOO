@@ -125,7 +125,29 @@ class NotasMenuPrincipal {
             }
         });
         painelBotao.add(buttonCriarNota);
+JButton buttonMarcarComoImportante = new JButton("Marcar como importante");
+        buttonMarcarComoImportante .addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Notas notaSelecionada = listaDeNotas.getSelectedValue();
+                if ((notaSelecionada != null) {
+                    marcarComoImportante(notaSelecionada);
+                    atualizarListaDeNotas(model, "todas");
 
+                    try {
+                        Persistencia.salvarNotas(categoriasList, marcarComoImportante);
+                    }   catch (IOException ex){
+                        System.out.println("Não foi possivel salvar as notas:" + ex.getMessage());
+                    }
+                    JOptionPane.showMessageDialog(frame, "Salvo como importante!");
+
+                }   else{
+                    JOptionPane.showMessageDialog(frame"Selecione uma nota para excluir", "ERRO", JOptionPane.ERROR_MESSAGE);
+                }
+
+            }
+        });
+                painelBotao.add(buttonMarcarComoImportante);
+        
         JButton buttonExcluirNotas = new JButton("Excluir Nota");
         buttonExcluirNotas .addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -332,6 +354,23 @@ class NotasMenuPrincipal {
                 break;
             }
         }
+    }
+
+    public static void marcarComoImportante(Notas nota){
+        for (Categorias categoria : categoriasList) {
+            // Procura a categoria à qual a nota original pertence
+            if (categoria.getListaDeNotas().remove(nota)) {
+                categoria.adicionarNota(notaImportante); // Adiciona a nova nota importante à mesma categoria
+                break;
+            }
+        }
+
+        // Atualizar a lista de notas na interface
+        atualizarListaDeNotas(model, "Todas");
+        JOptionPane.showMessageDialog(null, "Nota marcada como importante!");
+    } else {
+        JOptionPane.showMessageDialog(null, "Esta nota já é importante!", "Aviso", JOptionPane.INFORMATION_MESSAGE);
+    }
     }
 
     private static void mostrarNotasExcluidas() {
