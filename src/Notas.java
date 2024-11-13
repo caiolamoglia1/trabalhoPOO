@@ -12,12 +12,14 @@
     import java.util.ArrayList;
     import java.util.List;
 
+    //class NotaVaziaException
     class NotaVaziaException extends Exception{
         public NotaVaziaException(String mensagem) {
             super(mensagem);
         }
     }
 
+    //class Notas
     public class Notas implements Serializable {
         private String titulo;
         private String conteudo;
@@ -58,6 +60,7 @@
         }
     }
 
+    //class NotasImportantes
     class NotasImportantes extends Notas implements Serializable {
         public NotasImportantes(String titulo, String conteudo, String categoria) {
             super(titulo, conteudo, categoria);
@@ -71,7 +74,7 @@
             return "Importante: " + super.toString();
         }
     }
-
+    //class NotasFinalizadas
     class NotasFinalizadas extends Notas implements Serializable {
         public NotasFinalizadas(String titulo, String conteudo, String categoria) {
             super(titulo, conteudo, categoria);
@@ -85,7 +88,7 @@
             return "Finalizada: " + super.toString();
         }
     }
-
+    //class Categorias
     class Categorias implements Serializable {
         private String nomeCategoria;
         private ArrayList<Notas> listaDeNotas;
@@ -108,6 +111,7 @@
         }
     }
 
+    //class NotasMenuPrincipal
     class NotasMenuPrincipal {
         public static ArrayList<Categorias> categoriasList = new ArrayList<>();
         private static ArrayList<Notas> notasExcluidas = new ArrayList<>();
@@ -145,6 +149,7 @@
             JPanel painelBotao = new JPanel();
             painelBotao.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
+            //botão criar nota
             JButton buttonCriarNota = new JButton("Criar Nota");
             buttonCriarNota.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -158,6 +163,7 @@
             });
             painelBotao.add(buttonCriarNota);
 
+            //botão excluir nota
             JButton buttonExcluirNotas = new JButton("Excluir Nota");
             buttonExcluirNotas.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -189,6 +195,7 @@
             });
             painelBotao.add(buttonExcluirNotas);
 
+            //botão de notas excluídas
             JButton buttonNotasExcluidas = new JButton("Notas Excluídas");
             buttonNotasExcluidas.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -230,6 +237,7 @@
                 }
             });
 
+            // Botão Importar Arquivo
             JButton buttonImportarArquivo = new JButton("Importar Arquivo");
             buttonImportarArquivo.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -265,6 +273,7 @@
             });
             painelBotao.add(buttonImportarArquivo);
 
+            //Botão Marcar/Desmarcar Importante
             JButton buttonMarcarImportante = new JButton("Marcar/Desmarcar Importante");
             buttonMarcarImportante.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -284,6 +293,7 @@
             });
             painelBotao.add(buttonMarcarImportante);
 
+            // Botão Marcar/Desmarcar Finalizada
             JButton buttonMarcarFinalizada = new JButton("Marcar/Desmarcar Finalizada");
             buttonMarcarFinalizada.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -307,6 +317,7 @@
             frame.setVisible(true);
         }
 
+        //Metodo para exibir o conteúdo
         private static void mostrarConteudoNota(JFrame parentFrame, Notas nota) {
             JDialog dialog = new JDialog(parentFrame, "Conteúdo da Nota", true);
             Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -351,6 +362,7 @@
             dialog.add(painelTitulo, BorderLayout.NORTH);
             dialog.add(scrollPane, BorderLayout.CENTER);
 
+            //Botão Salvar Altereções
             JButton buttonSalvarAlteracoes = new JButton("Salvar Alterações");
             buttonSalvarAlteracoes.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -453,6 +465,7 @@
             JPanel painelBotao = new JPanel();
             painelBotao.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
+            //Botão salvar Nota
             JButton buttonSalvar = new JButton("Salvar Nota");
             buttonSalvar.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -565,6 +578,7 @@
         }
     }
 
+    //Classe Persistencia
     class Persistencia {
         private static String nomeArquivo = "Notas";
 
@@ -640,6 +654,7 @@
         }
     }
 
+    //classe Abstrata
     abstract class Arquivos{
         public abstract void lerArquivo(File arquivoSelecionado);
     }
