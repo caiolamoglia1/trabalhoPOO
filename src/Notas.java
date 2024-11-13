@@ -1,6 +1,10 @@
     package src;
 
     import javax.swing.*;
+    import javax.swing.text.AbstractDocument;
+    import javax.swing.text.AttributeSet;
+    import javax.swing.text.BadLocationException;
+    import javax.swing.text.DocumentFilter;
     import java.awt.*;
     import java.awt.event.ActionEvent;
     import java.awt.event.ActionListener;
@@ -311,6 +315,26 @@
 
             JTextField campoTitulo = new JTextField(nota.getTitulo(), 20);
             campoTitulo.setFont(new Font("Arial", Font.PLAIN, 18));
+            int limiteTitulo = 50;
+
+            ((AbstractDocument) campoTitulo.getDocument()).setDocumentFilter(new DocumentFilter() {
+                public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
+                    if ((fb.getDocument().getLength() + string.length()) <= limiteTitulo) {
+                        super.insertString(fb, offset, string, attr);
+                    } else {
+                        JOptionPane.showMessageDialog(dialog, "O título deve ter no máximo " + limiteTitulo + " caracteres.", "Limite de caracteres", JOptionPane.WARNING_MESSAGE);
+                    }
+                }
+
+                public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+                    if ((fb.getDocument().getLength() - length + text.length()) <= limiteTitulo) {
+                        super.replace(fb, offset, length, text, attrs);
+                    } else {
+                        JOptionPane.showMessageDialog(dialog, "O título deve ter no máximo " + limiteTitulo + " caracteres.", "Limite de caracteres", JOptionPane.WARNING_MESSAGE);
+                    }
+                }
+            });
+
 
             JTextArea areaTexto = new JTextArea(nota.getConteudo());
             areaTexto.setEditable(true);
@@ -374,6 +398,25 @@
 
             JTextField campoTitulo = new JTextField(20);
             int limiteTitulo = 50;
+
+            ((AbstractDocument) campoTitulo.getDocument()).setDocumentFilter(new DocumentFilter() {
+
+                public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
+                    if ((fb.getDocument().getLength() + string.length()) <= limiteTitulo) {
+                        super.insertString(fb, offset, string, attr);
+                    } else {
+                        JOptionPane.showMessageDialog(dialog, "O título deve ter no máximo " + limiteTitulo + " caracteres.", "Limite de caracteres", JOptionPane.WARNING_MESSAGE);
+                    }
+                }
+
+                public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+                    if ((fb.getDocument().getLength() - length + text.length()) <= limiteTitulo) {
+                        super.replace(fb, offset, length, text, attrs);
+                    } else {
+                        JOptionPane.showMessageDialog(dialog, "O título deve ter no máximo " + limiteTitulo + " caracteres.", "Limite de caracteres", JOptionPane.WARNING_MESSAGE);
+                    }
+                }
+            });
 
             campoTitulo.addKeyListener(new java.awt.event.KeyAdapter() {
                 public void keyTyped(java.awt.event.KeyEvent e) {
@@ -533,7 +576,7 @@
                     for (Notas nota : categoria.getListaDeNotas()) {
                         writer.write("Nota: " + nota.getTitulo());
                         writer.newLine();
-                        writer.write("Conteúdo: " + nota.getConteudo());
+                        writer.write("Conteúdo: " + nota.getConteudo().replace("\n", "\\n"));
                         writer.newLine();
                         writer.write("Categoria: " + nota.getCategoria());
                         writer.newLine();
@@ -546,7 +589,7 @@
                 for (Notas nota : notasExcluidas) {
                     writer.write("Nota: " + nota.getTitulo());
                     writer.newLine();
-                    writer.write("Conteúdo: " + nota.getConteudo());
+                    writer.write("Conteúdo: " + nota.getConteudo().replace("\n", "\\n"));
                     writer.newLine();
                     writer.write("Categoria: " + nota.getCategoria());
                     writer.newLine();
@@ -572,7 +615,7 @@
                         categoriaAtual = new Categorias(nomeCategoria);
                     } else if (linha.startsWith("Nota:")) {
                         String titulo = linha.substring("Nota: ".length());
-                        String conteudo = reader.readLine().substring("Conteúdo: ".length());
+                        String conteudo = reader.readLine().substring("Conteúdo: ".length()).replace("\\n", "\n");
                         String categoria = reader.readLine().substring("Categoria: ".length());
                         Notas nota = new Notas(titulo, conteudo, categoria);
                         categoriaAtual.adicionarNota(nota);
@@ -580,7 +623,7 @@
                         while ((linha = reader.readLine()) != null) {
                             if (linha.startsWith("Nota:")) {
                                 String titulo = linha.substring("Nota: ".length());
-                                String conteudo = reader.readLine().substring("Conteúdo: ".length());
+                                String conteudo = reader.readLine().substring("Conteúdo: ".length()).replace("\\n", "\n");
                                 String categoria = reader.readLine().substring("Categoria: ".length());
                                 Notas nota = new Notas(titulo, conteudo, categoria);
                                 notasExcluidas.add(nota);
